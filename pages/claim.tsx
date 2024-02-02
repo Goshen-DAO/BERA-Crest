@@ -7,6 +7,7 @@ import {
     Stack,
     Text,
     useToast,
+    Button
   } from "@chakra-ui/react";
   import {
     MediaRenderer,
@@ -14,12 +15,17 @@ import {
     useContract,
     useContractMetadata,
   } from "@thirdweb-dev/react";
+  import Link from "next/link";
   import {
     CALIM_TOKEN_CONTRACT_ADDRESS,
     CLAIM_TOKEN_IMAGE,
   } from "../const/addresses";
+  import {
+    useBalance,
+  } from "@thirdweb-dev/react";
   
   export default function ClaimPage() {
+    const nativeCurrencyBalance = useBalance();
     const { contract } = useContract(CALIM_TOKEN_CONTRACT_ADDRESS, "token-drop");
   
     const { data: contractMetadata } = useContractMetadata(contract);
@@ -28,7 +34,25 @@ import {
     const toast = useToast();
   
     return (
-      <Container maxW={"1440px"} minHeight={"80vh"} padding={6}>
+      <Container maxW="full" p={[4, 6]}>
+         {/* Display native currency balance */}
+         <Box bg="green.600" p={4} borderRadius="md">
+                <Heading as="h3" size="md" mb={1}>
+                  {nativeCurrencyBalance.isLoading
+                    ? "Loading..."
+                    : "Your Balance:"}
+                </Heading>
+                <Text>
+                  {nativeCurrencyBalance.isLoading
+                    ? "Loading..."
+                    : nativeCurrencyBalance.data
+                    ? `$${nativeCurrencyBalance.data.symbol} ${nativeCurrencyBalance.data.displayValue}`
+                    : "No balance available."}
+                </Text>
+              </Box>
+        <Link href="/dashboard">
+            <Button mb={4}>Back</Button>
+          </Link>
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
           <Flex justify={{ base: "center", md: "flex-end" }} align="center">
             <MediaRenderer src={CLAIM_TOKEN_IMAGE} height="100%" width="100%" />

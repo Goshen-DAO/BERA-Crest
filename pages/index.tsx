@@ -8,10 +8,12 @@ import {
   Stack,
   Text,
   Center,
+  Button,
 } from "@chakra-ui/react";
-import { MediaRenderer, ConnectWallet } from "@thirdweb-dev/react";
+import { MediaRenderer } from "@thirdweb-dev/react";
 import { FEATURES_IMAGE_URL, HERO_IMAGE_URL } from "../const/addresses";
 import FeatureCard from "../components/FeatureCard";
+import Link from "next/link";
 
 const Home: NextPage = () => {
   return (
@@ -32,10 +34,10 @@ const Home: NextPage = () => {
         >
           <Stack spacing={4}>
             <Heading
-              bgGradient="linear(to-l, #000000, #007639)"
-              bgClip="text"
-              fontWeight="extrabold"
-              fontSize={{ base: "4xl", md: "6xl" }}
+               bgGradient='linear(to-l, #7928CA, #FF0080)'
+               bgClip='text'
+               fontSize='6xl'
+               fontWeight='extrabold'
             >
               The Simplest Way to Pay Your Friends
             </Heading>
@@ -44,49 +46,9 @@ const Home: NextPage = () => {
               instantly
             </Text>
             <Flex alignItems="center" mt={4}>
-              <ConnectWallet
-                theme={"dark"}
-                btnTitle={"Login"}
-                modalTitle={"Login"}
-                switchToActiveChain={true}
-                modalSize={"wide"}
-                welcomeScreen={{
-                  img: {
-                    src: "https://raw.githubusercontent.com/getdemarked/Crest-App/main/public/crest_icon_logo_colored_nobg.png",
-                    width: 150,
-                    height: 150,
-                  },
-                  subtitle: "Login to access your account",
-                }}
-                modalTitleIconUrl={
-                  "https://raw.githubusercontent.com/getdemarked/Crest-App/main/public/favicon.ico"
-                }
-                detailsBtn={() => {
-                  return <Text></Text>;
-                }}
-              />
-              <span style={{ margin: "0 10px" }}></span>
-              <ConnectWallet
-                theme={"dark"}
-                btnTitle={"Get Started"}
-                modalTitle={"Sign Up Now!"}
-                switchToActiveChain={true}
-                modalSize={"wide"}
-                welcomeScreen={{
-                  img: {
-                    src: "https://raw.githubusercontent.com/getdemarked/Crest-App/main/public/crest_icon_logo_colored_nobg.png",
-                    width: 150,
-                    height: 150,
-                  },
-                  subtitle: "Sign up now to create an account",
-                }}
-                modalTitleIconUrl={
-                  "https://raw.githubusercontent.com/getdemarked/Crest-App/main/public/favicon.ico"
-                }
-                detailsBtn={() => {
-                  return <Text></Text>;
-                }}
-              />
+              <Link href="/dashboard">
+                <Button>Get Started</Button>
+              </Link>
             </Flex>
           </Stack>
         </Flex>

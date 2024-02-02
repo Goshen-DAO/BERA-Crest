@@ -1,0 +1,53 @@
+/* styles/dashboard.module.css */
+.dashboardContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px;
+    align-content: center;
+  }
+  
+  .iconButton {
+    border: 2px solid #54d37f;
+    border-radius: 8px;
+    padding: 6px;
+    margin: 8px;
+    text-align: center;
+    width: 80px;
+  }
+  
+  .iconButton a {
+    text-decoration: none;
+  color: #54d37f;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  }
+  
+  @media (max-width: 600px) {
+    .dashboardContainer {
+      display: grid; /* Use grid layout for small screens */
+      grid-template-columns: repeat(2, 1fr); /* Two columns in the grid */
+      gap: 10px; /* Add gap between columns */
+      align-items: center;
+    }
+  
+    .iconButton {
+      width: auto; /* Auto width for grid items */
+    }
+  }
+  
+  /* Additional styles for 4 columns on larger screens */
+  @media (min-width: 601px) and (max-width: 960px) {
+    .dashboardContainer {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr); /* Four columns in the grid */
+      gap: 10px; /* Add gap between columns */
+      justify-content: center;
+    }
+  
+    .iconButton {
+      width: auto;
+    }
+  }
+  

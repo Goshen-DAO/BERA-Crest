@@ -14,6 +14,9 @@ import NextLink from "next/link";
 const About: NextPage = () => {
   return (
     <Container maxW="800px" mt={10}>
+      <Link href="/dashboard">
+            <Button mb={4}>Back</Button>
+          </Link>
       <Heading as="h1" mb={6}>
         About Goshen DAO
       </Heading>

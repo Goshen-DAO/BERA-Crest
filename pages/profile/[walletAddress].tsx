@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import {
-  Avatar,
+  Box,
   Container,
   Flex,
   Heading,
@@ -21,20 +21,21 @@ import {
   useDisconnect,
   ConnectWallet,
   useOwnedNFTs,
-  ThirdwebNftMedia
+  ThirdwebNftMedia,
 } from "@thirdweb-dev/react";
 import { TRANSFER_CONTRACT_ADDRESS } from "../../const/addresses";
 import BalanceCard from "../../components/BalanceCard";
 import TransactionHistory from "../../components/TransactionHistory";
-import ProfilePicture from "../../components/ProfilePicture";
 import { useQRCode } from "next-qrcode";
 import { NFT_COLLECTION_ADDRESS } from "../../const/addresses";
 import styles from "../../styles/NFT.module.css";
-
-  
-
+import Link from "next/link";
+import {
+  useBalance,
+} from "@thirdweb-dev/react";
 
 export default function AccountPage() {
+  const nativeCurrencyBalance = useBalance();
   const disconnect = useDisconnect();
   const address = useAddress();
   const [isCopied, setIsCopied] = useState(false);
@@ -43,29 +44,26 @@ export default function AccountPage() {
   const { data: verifiedTokens, isLoading: isVerifiedTokensLoading } =
     useContractRead(transferContract, "getVerifiedTokens");
 
-    const { contract: daonftContract } = useContract(NFT_COLLECTION_ADDRESS);
-    const { data, isLoading, error } = useOwnedNFTs(daonftContract, address);
-    
+  const { contract: daonftContract } = useContract(NFT_COLLECTION_ADDRESS);
+  const { data, isLoading, error } = useOwnedNFTs(daonftContract, address);
 
-
-    const [parentTabIndex, setParentTabIndex] = React.useState(0);
-    const [nestedTabIndex, setNestedTabIndex] = React.useState(0);
+  const [parentTabIndex, setParentTabIndex] = React.useState(0);
+  const [nestedTabIndex, setNestedTabIndex] = React.useState(0);
 
   const nftGridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(5, 1fr)', // Three columns
-    gap: '16px',
-    height: '100%', // Set the height to 100%
-    overflow: 'auto', // Enable overflow for scrolling
+    display: "grid",
+    gridTemplateColumns: "repeat(5, 1fr)", // Three columns
+    gap: "16px",
+    height: "100%", // Set the height to 100%
+    overflow: "auto", // Enable overflow for scrolling
   };
-  
+
   // Style for each NFT box
   const nftBoxStyle = {
-    border: '1px solid #ccc',
-    borderRadius: '8px',
-    padding: '5px',
+    border: "1px solid #ccc",
+    borderRadius: "8px",
+    padding: "5px",
   };
-  
 
   function copyToClipboard(text: string) {
     const textarea = document.createElement("textarea");
@@ -84,11 +82,37 @@ export default function AccountPage() {
     )}`;
   }
 
+
   return (
-    <Container maxW={"1440px"} py={4}>
+    <Container maxW="full" p={[4, 6]}>
       {address ? (
         <Flex flexDirection={["column", "column", "row"]}>
-          <Flex flexDirection={"column"} mr={[0, 0, 8]} p={10} alignItems={["center"]}>
+          
+         {/* Display native currency balance */}
+         <Box bg="green.600" p={4} borderRadius="md">
+                <Heading as="h3" size="md" mb={1}>
+                  {nativeCurrencyBalance.isLoading
+                    ? "Loading..."
+                    : "Your Balance:"}
+                </Heading>
+                <Text>
+                  {nativeCurrencyBalance.isLoading
+                    ? "Loading..."
+                    : nativeCurrencyBalance.data
+                    ? `$${nativeCurrencyBalance.data.symbol} ${nativeCurrencyBalance.data.displayValue}`
+                    : "No balance available."}
+                </Text>
+              </Box>
+          <Link href="/dashboard">
+            <Button mb={4}>Back</Button>
+          </Link>
+          <Flex
+            flexDirection={"column"}
+            mr={[0, 0, 8]}
+            p={10}
+            alignItems={["center"]}
+          >
+            
             <ConnectWallet
               theme={"dark"}
               btnTitle={"Click Me to Login"}
@@ -145,63 +169,83 @@ export default function AccountPage() {
               <br></br>
               <Button onClick={disconnect}>Logout</Button>
             </Flex>
-            </Flex>
+          </Flex>
           <Flex flexDirection={"column"} w={"100%"}>
-          <Tabs index={parentTabIndex} onChange={index => setParentTabIndex(index)}>
-      <TabList>
-        <Tab>Wallet Balance</Tab>
-        <Tab>Digital Collectibles</Tab>
-        <Tab>Transaction History</Tab>
-      </TabList>
-      <TabPanels mt={4}>
-        <TabPanel>
-          <Heading textAlign={["center"]}>Wallet Balance</Heading>
-          <SimpleGrid columns={[1]} spacing={0} mt={1}>
-    {!isVerifiedTokensLoading ? (
-     verifiedTokens.map((token: string) => (
-      <center key={token}><BalanceCard tokenAddress={token} /></center>
-    ))
-    ) : (
+            <Tabs
+              index={parentTabIndex}
+              onChange={(index) => setParentTabIndex(index)}
+            >
+              <TabList>
+                <Tab>Wallet Balance</Tab>
+                <Tab>Digital Collectibles</Tab>
+                <Tab>Transaction History</Tab>
+              </TabList>
+              <TabPanels mt={4}>
+                <TabPanel>
+                  <Heading textAlign={["center"]}>Wallet Balance</Heading>
+                  <SimpleGrid columns={[1]} spacing={0} mt={1}>
+                    {!isVerifiedTokensLoading ? (
+                      verifiedTokens.map((token: string) => (
+                        <center key={token}>
+                          <BalanceCard tokenAddress={token} />
+                        </center>
+                      ))
+                    ) : (
                       <Spinner />
                     )}
                   </SimpleGrid>
-        </TabPanel>
+                </TabPanel>
 
-        <TabPanel>
-          <Heading textAlign={["center"]}>Digital Collectibles</Heading>
-          <Tabs index={nestedTabIndex} onChange={index => setNestedTabIndex(index)}>
-        <TabList>
-          <Tab>Goshen DAO Pass</Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel>
-            <div style={nftGridStyle}>
-              {data && data.map((nft) => (
-                <a key={nft.metadata.id} href={`https://marketplace.goshendao.com/token/${NFT_COLLECTION_ADDRESS}/${nft.metadata.id}`} target="_blank" rel="noopener noreferrer" style={nftBoxStyle}>
-                  <ThirdwebNftMedia metadata={nft.metadata} className={styles.nftImage} />
-                  <p className={styles.nftTokenId}>Digital Collectible ID #{nft.metadata.id}</p>
-                  <p className={styles.nftName}>{nft.metadata.name}</p>
-                </a>
-              ))}
-            </div>
-          </TabPanel>
-          <TabPanel>
-         Under Development
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
-        </TabPanel>
+                <TabPanel>
+                  <Heading textAlign={["center"]}>Digital Collectibles</Heading>
+                  <Tabs
+                    index={nestedTabIndex}
+                    onChange={(index) => setNestedTabIndex(index)}
+                  >
+                    <TabList>
+                      <Tab>Goshen DAO Pass</Tab>
+                    </TabList>
+                    <TabPanels>
+                      <TabPanel>
+                        <div style={nftGridStyle}>
+                          {data &&
+                            data.map((nft) => (
+                              <a
+                                key={nft.metadata.id}
+                                href={`https://marketplace.goshendao.com/token/${NFT_COLLECTION_ADDRESS}/${nft.metadata.id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={nftBoxStyle}
+                              >
+                                <ThirdwebNftMedia
+                                  metadata={nft.metadata}
+                                  className={styles.nftImage}
+                                />
+                                <p className={styles.nftTokenId}>
+                                  Digital Collectible ID #{nft.metadata.id}
+                                </p>
+                                <p className={styles.nftName}>
+                                  {nft.metadata.name}
+                                </p>
+                              </a>
+                            ))}
+                        </div>
+                      </TabPanel>
+                      <TabPanel>Under Development</TabPanel>
+                    </TabPanels>
+                  </Tabs>
+                </TabPanel>
 
-        <TabPanel>
-          <Heading textAlign={["center"]}>Transaction History</Heading>
-          <TransactionHistory />
-        </TabPanel>
-      </TabPanels>
-    </Tabs>
+                <TabPanel>
+                  <Heading textAlign={["center"]}>Transaction History</Heading>
+                  <TransactionHistory />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
           </Flex>
-          
         </Flex>
-      ) : (        <Flex justifyContent="center" alignItems="center" height="100vh">
+      ) : (
+        <Flex justifyContent="center" alignItems="center" height="100vh">
           <ConnectWallet
             theme={"dark"}
             btnTitle={"Please login to continue"}
